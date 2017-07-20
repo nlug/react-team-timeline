@@ -20,7 +20,7 @@ const timelineStyle = {
 };
 class TimeLine extends React.Component {
   render() {
-    const { title, groups, items, fromTime, toTime, displayFrom, timeStep } = this.props;
+    const { title, groups, items, fromTime, toTime, displayFrom, timeStep, blockWidth, timeColFormat } = this.props;
     const timelineContentProps = {
       title,
       groups,
@@ -29,6 +29,8 @@ class TimeLine extends React.Component {
       toTime,
       displayFrom,
       timeStep,
+      blockWidth,
+      timeColFormat,
     };
     return (
       <div className="timeline" style={timelineStyle}>
@@ -69,7 +71,7 @@ const timelineContentStyle = {
   width: '90%',
 };
 const coltitleWrapperStyle = {
-  display: 'flex',
+  display: 'inline-flex',
   height: timeHeight,
 };
 const timelineWindowStyle = {
@@ -78,7 +80,6 @@ const timelineWindowStyle = {
 };
 const scrollableStyle = {
   position: 'relative',
-  width: 3000,
 };
 class TimelineContent extends React.Component {
   constructor(props) {
@@ -106,7 +107,7 @@ class TimelineContent extends React.Component {
     };
   }
   render() {
-    const { groups, items, title } = this.props;
+    const { groups, items, title, blockWidth, timeColFormat } = this.props;
     return (
       <div className="timeline-content" style={timelineContentStyle}>
         <Header title={title} />
@@ -114,7 +115,7 @@ class TimelineContent extends React.Component {
           <div className="scrollable" style={scrollableStyle}>
             <div className="coltitle-wrapper" style={coltitleWrapperStyle}>
               {
-                this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} width={this.state.width} />)
+                this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} width={blockWidth} format={timeColFormat} />)
               }
             </div>
             <Timer fromTime={this.props.fromTime} timeSpend={this.state.timeSpend} />
@@ -157,7 +158,6 @@ class Timer extends React.Component {
   }
   componentDidMount() {
     this.ticker = setInterval(() => {
-      console.log('ticked', (moment().valueOf() - this.fromTime) / this.timeSpend);
       this.setState({
         leftPosition: (moment().valueOf() - this.fromTime) / this.timeSpend,
       });
@@ -188,13 +188,13 @@ class Timer extends React.Component {
 }
 class ColTitle extends React.Component {
   render() {
-    const { time, width } = this.props;
+    const { time, width, format } = this.props;
     const style = {
-      width: `${width}%`,
+      width: width,
     };
     return (
       <div className="col-title" style={style}>
-        {time.format('HH:mm')}
+        {time.format(format)}
       </div>
     );
   }
@@ -272,10 +272,16 @@ TimeLine.propTypes = {
   fromTime: React.PropTypes.object.isRequired, // Moment Object
   toTime: React.PropTypes.object.isRequired, // Moment Object
   displayFrom: React.PropTypes.object, // Moment Object
-  maxSizeView: React.PropTypes.number, // in Minutes
+  blockWidth: React.PropTypes.number, // in Minutes
   timeStep: React.PropTypes.number, // in Minutes
   groups: React.PropTypes.arrayOf(React.PropTypes.object),
   items: React.PropTypes.arrayOf(React.PropTypes.object),
+  timeColFormat: React.PropTypes.string,
+};
+
+TimeLine.defaultProps = {
+  blockWidth: 70,
+  timeColFormat: 'HH:mm',
 };
 
 export default TimeLine;

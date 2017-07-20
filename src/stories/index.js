@@ -19,6 +19,7 @@ storiesOf('TimeLine', module)
       toTime: moment().endOf('hour'),
       displayFrom: moment(),
       timeStep: 5,
+      blockWidth: 100,
       groups,
       items,
     };
