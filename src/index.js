@@ -67,11 +67,18 @@ class SideBar extends React.Component {
 }
 const timelineContentStyle = {
   width: '90%',
-  position: 'relative',
 };
 const coltitleWrapperStyle = {
   display: 'flex',
   height: timeHeight,
+};
+const timelineWindowStyle = {
+  width: '100%',
+  overflowX: 'auto',
+};
+const scrollableStyle = {
+  position: 'relative',
+  width: 3000,
 };
 class TimelineContent extends React.Component {
   constructor(props) {
@@ -103,15 +110,19 @@ class TimelineContent extends React.Component {
     return (
       <div className="timeline-content" style={timelineContentStyle}>
         <Header title={title} />
-        <div className="coltitle-wrapper" style={coltitleWrapperStyle}>
-          {
-            this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} width={this.state.width} />)
-          }
+        <div className="timeline-window" style={timelineWindowStyle}>
+          <div className="scrollable" style={scrollableStyle}>
+            <div className="coltitle-wrapper" style={coltitleWrapperStyle}>
+              {
+                this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} width={this.state.width} />)
+              }
+            </div>
+            <Timer fromTime={this.props.fromTime} timeSpend={this.state.timeSpend} />
+            {
+              groups.map(aGroup => <ItemsGroup key={aGroup.id} items={items.filter(item => item.groupId === aGroup.id)} {...this.state} />)
+            }
+          </div>
         </div>
-        <Timer fromTime={this.props.fromTime} timeSpend={this.state.timeSpend} />
-        {
-          groups.map(aGroup => <ItemsGroup key={aGroup.id} items={items.filter(item => item.groupId === aGroup.id)} {...this.state} />)
-        }
       </div>
     )
   }
