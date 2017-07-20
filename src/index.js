@@ -61,7 +61,7 @@ const scrollableStyle = {
 class TimelineContent extends React.Component {
   constructor(props) {
     super(props);
-    const { timeStep, blockWidth, onClickItem } = props;
+    const { timeStep, onClickItem } = props;
     const fromTime = Math.round(props.fromTime.unix() / 60);
     const toTime = Math.round(props.toTime.unix() / 60);
     const timeSpend = toTime - fromTime;
@@ -81,12 +81,11 @@ class TimelineContent extends React.Component {
       totalColunm,
       timeStep,
       width: (1 / totalColunm) * 100,
-      blockWidth,
       onClickItem,
     };
   }
   render() {
-    const { groups, items, title, blockWidth, timeColFormat } = this.props;
+    const { groups, items, title, timeColFormat } = this.props;
     return (
       <div className="timeline-content">
         <Header title={title} />
@@ -94,7 +93,7 @@ class TimelineContent extends React.Component {
           <div className="scrollable" style={scrollableStyle}>
             <div className="coltitle-wrapper">
               {
-                this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} width={blockWidth} format={timeColFormat} />)
+                this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} format={timeColFormat} />)
               }
             </div>
             <Timer fromTime={this.props.fromTime} timeSpend={this.state.timeSpend} />
@@ -173,10 +172,10 @@ class ColTitle extends React.Component {
 class ItemsGroup extends React.Component {
   render() {
     console.log(this.props);
-    const { totalColunm, blockWidth, items, timeSpend, fromTime, onClickItem } = this.props;
+    const { totalColunm, items, timeSpend, fromTime, onClickItem } = this.props;
     const timeSlots = []
     for (var i = 0; i < totalColunm; i++) {
-      timeSlots.push(<TimeSlot key={i} width={blockWidth} />);
+      timeSlots.push(<TimeSlot key={i} />);
     }
     return (
       <div className="items-group">
@@ -230,8 +229,7 @@ TimeLine.propTypes = {
   title: React.PropTypes.string,
   fromTime: React.PropTypes.object.isRequired, // Moment Object
   toTime: React.PropTypes.object.isRequired, // Moment Object
-  displayFrom: React.PropTypes.object, // Moment Object https://stackoverflow.com/questions/635706/how-to-scroll-to-an-element-inside-a-div
-  blockWidth: React.PropTypes.number, // in Minutes
+  displayFrom: React.PropTypes.object, // Moment Object Todo: https://stackoverflow.com/questions/635706/how-to-scroll-to-an-element-inside-a-div
   timeStep: React.PropTypes.number, // in Minutes
   groups: React.PropTypes.arrayOf(React.PropTypes.object),
   items: React.PropTypes.arrayOf(React.PropTypes.object),
@@ -240,7 +238,6 @@ TimeLine.propTypes = {
 };
 
 TimeLine.defaultProps = {
-  blockWidth: 70,
   timeColFormat: 'HH:mm',
 };
 

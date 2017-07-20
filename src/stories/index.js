@@ -11,7 +11,7 @@ storiesOf('TimeLine', module)
     ];
     const items = [
       { id: 1, groupId: 1, title: 'I belong to Group 1', startTime: moment('2017-07-20 21:10'), endTime: moment('2017-07-20 21:30') },
-      { id: 2, groupId: 2, title: 'And I belong to Group 2', startTime: moment().add(5, 'm'), endTime: moment().add(20, 'h') },
+      { id: 2, groupId: 2, title: 'And I belong to Group 2', startTime: moment().add(-10, 'm'), endTime: moment().add(20, 'm') },
     ];
     const props = {
       title: 'React Team Timeline Calendar',
@@ -19,7 +19,6 @@ storiesOf('TimeLine', module)
       toTime: moment().endOf('hour'),
       displayFrom: moment(),
       timeStep: 5,
-      blockWidth: 160,
       groups,
       items,
     };
