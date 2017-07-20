@@ -1,63 +1,50 @@
 import React from 'react';
 import moment from 'moment';
-// import './style.scss';
-// const buttonStyles = {
-//   border: '1px solid #eee',
-//   borderRadius: 3,
-//   backgroundColor: '#FFFFFF',
-//   cursor: 'pointer',
-//   fontSize: 15,
-//   padding: '3px 10px',
-// };
-const titleHeight = 30;
-const lineHeight = 40;
-const timeHeight = 30;
+import './style.css';
 
-const timelineStyle = {
-  display: 'flex',
-  justifyContent: 'flex-start',
-  alignItems: 'stretch',
-};
 class TimeLine extends React.Component {
   render() {
-    const { title, groups, items, fromTime, toTime, displayFrom, timeStep, blockWidth, timeColFormat } = this.props;
+    const { title, groups, items, fromTime, toTime, displayFrom, timeStep, blockWidth, timeColFormat, onClickItem } = this.props;
+    const itemFiltered = items
+      .filter(item => item.endTime > fromTime && item.startTime < toTime)
+      .map(item => {
+        const newItem = { ...item };
+        if (newItem.startTime < fromTime) {
+          newItem.startTime = moment(fromTime);
+        }
+        if (newItem.endTime > toTime) {
+          newItem.endTime = moment(toTime);
+        }
+        return newItem;
+      });
     const timelineContentProps = {
       title,
       groups,
-      items,
+      items: itemFiltered,
       fromTime,
       toTime,
       displayFrom,
       timeStep,
       blockWidth,
       timeColFormat,
+      onClickItem,
     };
     return (
-      <div className="timeline" style={timelineStyle}>
+      <div className="timeline">
         <SideBar groups={groups} />
         <TimelineContent {...timelineContentProps} />
       </div>
     );
   }
 }
-const sidebarStyle = {
-  width: '10%',
-  display: 'flex',
-  flexDirection: 'column',
-};
-const sidebarTitleStyle = {
-  height: titleHeight + timeHeight,
-};
-const groupItemstyle = {
-  height: lineHeight,
-};
-const GroupItem = ({ title }) => (<div className="group-item" style={groupItemstyle}>{title}</div>);
+
+const GroupItem = ({ title }) => (<div className="group-item">{title}</div>);
 class SideBar extends React.Component {
   render() {
     const { groups } = this.props;
     return (
-      <div className="side-bar" style={sidebarStyle}>
-        <div className="sidebar-title" style={sidebarTitleStyle}>Sidebar Title</div>
+      <div className="side-bar">
+        <div className="sidebar-title">Sidebar Title</div>
         <div className="group-colunm">
           {
             groups.map(aGroup => <GroupItem key={aGroup.id} {...aGroup} />)
@@ -67,24 +54,14 @@ class SideBar extends React.Component {
     );
   }
 }
-const timelineContentStyle = {
-  width: '90%',
-};
-const coltitleWrapperStyle = {
-  display: 'inline-flex',
-  height: timeHeight,
-};
-const timelineWindowStyle = {
-  width: '100%',
-  overflowX: 'auto',
-};
+
 const scrollableStyle = {
   position: 'relative',
 };
 class TimelineContent extends React.Component {
   constructor(props) {
     super(props);
-    const { timeStep } = props;
+    const { timeStep, blockWidth, onClickItem } = props;
     const fromTime = Math.round(props.fromTime.unix() / 60);
     const toTime = Math.round(props.toTime.unix() / 60);
     const timeSpend = toTime - fromTime;
@@ -104,16 +81,18 @@ class TimelineContent extends React.Component {
       totalColunm,
       timeStep,
       width: (1 / totalColunm) * 100,
+      blockWidth,
+      onClickItem,
     };
   }
   render() {
     const { groups, items, title, blockWidth, timeColFormat } = this.props;
     return (
-      <div className="timeline-content" style={timelineContentStyle}>
+      <div className="timeline-content">
         <Header title={title} />
-        <div className="timeline-window" style={timelineWindowStyle}>
+        <div className="timeline-window">
           <div className="scrollable" style={scrollableStyle}>
-            <div className="coltitle-wrapper" style={coltitleWrapperStyle}>
+            <div className="coltitle-wrapper">
               {
                 this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} width={blockWidth} format={timeColFormat} />)
               }
@@ -128,16 +107,14 @@ class TimelineContent extends React.Component {
     )
   }
 }
-const timelineHeaderStyle = {
-  height: titleHeight,
-}
+
 class Header extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
     return (
-      <div className="timeline-header" style={timelineHeaderStyle}>
+      <div className="timeline-header">
         <div className="timeline-title">
           {this.props.title}
         </div>
@@ -175,51 +152,39 @@ class Timer extends React.Component {
     }
     const timerStyle = {
       width,
-      height: 70,
-      border: '1px solid red',
-      borderWidth: '0px 0px 0px 1px',
-      position: 'absolute',
       left: `${leftPosition * 100}%`,
     };
     return (
-      <div style={timerStyle}></div>
+      <div className="ticker" style={timerStyle}></div>
     );
   }
 }
 class ColTitle extends React.Component {
   render() {
-    const { time, width, format } = this.props;
-    const style = {
-      width: width,
-    };
+    const { time, format } = this.props;
     return (
-      <div className="col-title" style={style}>
+      <div className="col-title">
         {time.format(format)}
       </div>
     );
   }
 }
-const itemsGroupStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  position: 'relative',
-  height: lineHeight,
-};
+
 class ItemsGroup extends React.Component {
   render() {
     console.log(this.props);
-    const { totalColunm, width, items, timeSpend, fromTime } = this.props;
+    const { totalColunm, blockWidth, items, timeSpend, fromTime, onClickItem } = this.props;
     const timeSlots = []
     for (var i = 0; i < totalColunm; i++) {
-      timeSlots.push(<TimeSlot key={i} width={width} />);
+      timeSlots.push(<TimeSlot key={i} width={blockWidth} />);
     }
     return (
-      <div className="items-group" style={itemsGroupStyle}>
+      <div className="items-group">
       {
         timeSlots.map(_ => _)
       }
       {
-        items.map(item => <Item key={item.id} value={item} timeSpend={timeSpend} fromTime={fromTime} />)
+        items.map(item => <Item key={item.id} value={item} timeSpend={timeSpend} onClickItem={onClickItem} fromTime={fromTime} />)
       }
       </div>
     )
@@ -228,38 +193,32 @@ class ItemsGroup extends React.Component {
 
 class TimeSlot extends React.Component {
   render() {
-    const { width } = this.props
-    const style = {
-      width: `${width}%`,
-      height: lineHeight,
-    };
-    return (
-      <div className="time-slot" style={style}></div>
-    )
+    return <div className="time-slot" />;
   }
 }
 
 // Todo: Check endTime > startTime
 class Item extends React.Component {
-  render() {
+  constructor(props) {
+    super(props);
     const { fromTime, timeSpend } = this.props;
-    const { title, startTime, endTime } = this.props.value;
+    const { startTime, endTime } = this.props.value;
     const startTimeInMin = Math.round(startTime.unix() / 60);
     const endTimeInMin = Math.round(endTime.unix() / 60);
     const itemSpend = endTimeInMin - startTimeInMin;
     const leftPosition = ((startTimeInMin - fromTime) / timeSpend) * 100;
     const itemWidth = (itemSpend / timeSpend) * 100;
     console.log(fromTime);
-    const style = {
+    this.style = {
       width: `${itemWidth}%`,
-      position: 'absolute',
       left: `${leftPosition}%`,
-      display: 'inline-block',
-      overflow: 'hidden',
-      height: lineHeight - 7,
     };
+  }
+  render() {
+    const { onClickItem } = this.props;
+    const { id, title } = this.props.value;
     return (
-      <div className="timeline-item" style={style}>
+      <div className="timeline-item" onClick={() => onClickItem(id)} style={this.style}>
         {title}
       </div>
     )
@@ -271,12 +230,13 @@ TimeLine.propTypes = {
   title: React.PropTypes.string,
   fromTime: React.PropTypes.object.isRequired, // Moment Object
   toTime: React.PropTypes.object.isRequired, // Moment Object
-  displayFrom: React.PropTypes.object, // Moment Object
+  displayFrom: React.PropTypes.object, // Moment Object https://stackoverflow.com/questions/635706/how-to-scroll-to-an-element-inside-a-div
   blockWidth: React.PropTypes.number, // in Minutes
   timeStep: React.PropTypes.number, // in Minutes
   groups: React.PropTypes.arrayOf(React.PropTypes.object),
   items: React.PropTypes.arrayOf(React.PropTypes.object),
   timeColFormat: React.PropTypes.string,
+  onClickItem: React.PropTypes.func,
 };
 
 TimeLine.defaultProps = {

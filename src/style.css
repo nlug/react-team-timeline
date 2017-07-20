@@ -1,0 +1,70 @@
+.timeline {
+  border: 1px solid #c7c7c7;
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  text-align: center;
+}
+.side-bar {
+  width: 10%;
+  display: flex;
+  flex-direction: column;
+  border: 0px solid #b8b8b8;
+  border-right-width: 1px;
+  margin-right: 7px;
+  padding-right: 7px;
+}
+.sidebar-title {
+  height: 70px; /* Line height + TIMELINE title height */
+  border: 0px solid #b8b8b8;
+  border-bottom-width: 1px;
+}
+
+.group-item {
+  height: 40px; /* Line height */
+}
+.timeline-content {
+  width: 90%
+}
+.timeline-window {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.coltitle-wrapper {
+  display: inline-flex;
+  height: 30px; /* Time title height */
+  border: 0px solid #b8b8b8;
+  border-bottom-width: 1px;
+  text-align: left;
+}
+.timeline-header {
+  height: 40px; /* TIMELINE title height */
+}
+.ticker {
+  border: 1px solid red;
+  border-width: 0px 0px 0px 1px;
+  position: absolute;
+  height: 95%;
+}
+.col-title {
+  width: 100px; /* Block width */
+}
+.items-group {
+  display: inline-flex;
+  flex-direction: row;
+  position: relative;
+  height: 40px; /* Line height */
+}
+.time-slot {
+  width: 100px;/* Block width */
+  height: 40px; /* Line height */
+}
+.timeline-item {
+  position: absolute;
+  display: inline-block;
+  overflow: hidden;
+  height: 30px;
+  border: 1px solid #b8b8b8;
+}
