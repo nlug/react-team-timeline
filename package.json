@@ -1,10 +1,10 @@
 {
   "name": "react-team-timeline",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "React Team Timeline Component",
   "repository": {
     "type": "git",
-    "url": "https://github.com/you/repo.git"
+    "url": "https://github.com/nlug/react-team-timeline.git"
   },
   "license": "MIT",
   "scripts": {
