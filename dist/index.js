@@ -36,26 +36,9 @@ var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
 
+require('./style.css');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// import './style.scss';
-// const buttonStyles = {
-//   border: '1px solid #eee',
-//   borderRadius: 3,
-//   backgroundColor: '#FFFFFF',
-//   cursor: 'pointer',
-//   fontSize: 15,
-//   padding: '3px 10px',
-// };
-var titleHeight = 30;
-var lineHeight = 40;
-var timeHeight = 30;
-
-var timelineStyle = {
-  display: 'flex',
-  justifyContent: 'flex-start',
-  alignItems: 'stretch'
-};
 
 var TimeLine = function (_React$Component) {
   (0, _inherits3.default)(TimeLine, _React$Component);
@@ -77,22 +60,36 @@ var TimeLine = function (_React$Component) {
           displayFrom = _props.displayFrom,
           timeStep = _props.timeStep,
           blockWidth = _props.blockWidth,
-          timeColFormat = _props.timeColFormat;
+          timeColFormat = _props.timeColFormat,
+          onClickItem = _props.onClickItem;
 
+      var itemFiltered = items.filter(function (item) {
+        return item.endTime > fromTime && item.startTime < toTime;
+      }).map(function (item) {
+        var newItem = (0, _extends3.default)({}, item);
+        if (newItem.startTime < fromTime) {
+          newItem.startTime = (0, _moment2.default)(fromTime);
+        }
+        if (newItem.endTime > toTime) {
+          newItem.endTime = (0, _moment2.default)(toTime);
+        }
+        return newItem;
+      });
       var timelineContentProps = {
         title: title,
         groups: groups,
-        items: items,
+        items: itemFiltered,
         fromTime: fromTime,
         toTime: toTime,
         displayFrom: displayFrom,
         timeStep: timeStep,
         blockWidth: blockWidth,
-        timeColFormat: timeColFormat
+        timeColFormat: timeColFormat,
+        onClickItem: onClickItem
       };
       return _react2.default.createElement(
         'div',
-        { className: 'timeline', style: timelineStyle },
+        { className: 'timeline' },
         _react2.default.createElement(SideBar, { groups: groups }),
         _react2.default.createElement(TimelineContent, timelineContentProps)
       );
@@ -101,22 +98,11 @@ var TimeLine = function (_React$Component) {
   return TimeLine;
 }(_react2.default.Component);
 
-var sidebarStyle = {
-  width: '10%',
-  display: 'flex',
-  flexDirection: 'column'
-};
-var sidebarTitleStyle = {
-  height: titleHeight + timeHeight
-};
-var groupItemstyle = {
-  height: lineHeight
-};
 var GroupItem = function GroupItem(_ref) {
   var title = _ref.title;
   return _react2.default.createElement(
     'div',
-    { className: 'group-item', style: groupItemstyle },
+    { className: 'group-item' },
     title
   );
 };
@@ -136,10 +122,10 @@ var SideBar = function (_React$Component2) {
 
       return _react2.default.createElement(
         'div',
-        { className: 'side-bar', style: sidebarStyle },
+        { className: 'side-bar' },
         _react2.default.createElement(
           'div',
-          { className: 'sidebar-title', style: sidebarTitleStyle },
+          { className: 'sidebar-title' },
           'Sidebar Title'
         ),
         _react2.default.createElement(
@@ -155,17 +141,6 @@ var SideBar = function (_React$Component2) {
   return SideBar;
 }(_react2.default.Component);
 
-var timelineContentStyle = {
-  width: '90%'
-};
-var coltitleWrapperStyle = {
-  display: 'inline-flex',
-  height: timeHeight
-};
-var timelineWindowStyle = {
-  width: '100%',
-  overflowX: 'auto'
-};
 var scrollableStyle = {
   position: 'relative'
 };
@@ -178,7 +153,8 @@ var TimelineContent = function (_React$Component3) {
 
     var _this3 = (0, _possibleConstructorReturn3.default)(this, (TimelineContent.__proto__ || (0, _getPrototypeOf2.default)(TimelineContent)).call(this, props));
 
-    var timeStep = props.timeStep;
+    var timeStep = props.timeStep,
+        onClickItem = props.onClickItem;
 
     var fromTime = Math.round(props.fromTime.unix() / 60);
     var toTime = Math.round(props.toTime.unix() / 60);
@@ -198,7 +174,8 @@ var TimelineContent = function (_React$Component3) {
       timeSpend: timeSpend,
       totalColunm: totalColunm,
       timeStep: timeStep,
-      width: 1 / totalColunm * 100
+      width: 1 / totalColunm * 100,
+      onClickItem: onClickItem
     };
     return _this3;
   }
@@ -212,24 +189,23 @@ var TimelineContent = function (_React$Component3) {
           groups = _props2.groups,
           items = _props2.items,
           title = _props2.title,
-          blockWidth = _props2.blockWidth,
           timeColFormat = _props2.timeColFormat;
 
       return _react2.default.createElement(
         'div',
-        { className: 'timeline-content', style: timelineContentStyle },
+        { className: 'timeline-content' },
         _react2.default.createElement(Header, { title: title }),
         _react2.default.createElement(
           'div',
-          { className: 'timeline-window', style: timelineWindowStyle },
+          { className: 'timeline-window' },
           _react2.default.createElement(
             'div',
             { className: 'scrollable', style: scrollableStyle },
             _react2.default.createElement(
               'div',
-              { className: 'coltitle-wrapper', style: coltitleWrapperStyle },
+              { className: 'coltitle-wrapper' },
               this.columns.map(function (aCol, idx) {
-                return _react2.default.createElement(ColTitle, { key: idx, time: aCol, width: blockWidth, format: timeColFormat });
+                return _react2.default.createElement(ColTitle, { key: idx, time: aCol, format: timeColFormat });
               })
             ),
             _react2.default.createElement(Timer, { fromTime: this.props.fromTime, timeSpend: this.state.timeSpend }),
@@ -246,10 +222,6 @@ var TimelineContent = function (_React$Component3) {
   return TimelineContent;
 }(_react2.default.Component);
 
-var timelineHeaderStyle = {
-  height: titleHeight
-};
-
 var Header = function (_React$Component4) {
   (0, _inherits3.default)(Header, _React$Component4);
 
@@ -263,7 +235,7 @@ var Header = function (_React$Component4) {
     value: function render() {
       return _react2.default.createElement(
         'div',
-        { className: 'timeline-header', style: timelineHeaderStyle },
+        { className: 'timeline-header' },
         _react2.default.createElement(
           'div',
           { className: 'timeline-title' },
@@ -320,13 +292,9 @@ var Timer = function (_React$Component5) {
       }
       var timerStyle = {
         width: width,
-        height: 70,
-        border: '1px solid red',
-        borderWidth: '0px 0px 0px 1px',
-        position: 'absolute',
         left: leftPosition * 100 + '%'
       };
-      return _react2.default.createElement('div', { style: timerStyle });
+      return _react2.default.createElement('div', { className: 'ticker', style: timerStyle });
     }
   }]);
   return Timer;
@@ -345,28 +313,17 @@ var ColTitle = function (_React$Component6) {
     value: function render() {
       var _props3 = this.props,
           time = _props3.time,
-          width = _props3.width,
           format = _props3.format;
 
-      var style = {
-        width: width
-      };
       return _react2.default.createElement(
         'div',
-        { className: 'col-title', style: style },
+        { className: 'col-title' },
         time.format(format)
       );
     }
   }]);
   return ColTitle;
 }(_react2.default.Component);
-
-var itemsGroupStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  position: 'relative',
-  height: lineHeight
-};
 
 var ItemsGroup = function (_React$Component7) {
   (0, _inherits3.default)(ItemsGroup, _React$Component7);
@@ -382,23 +339,23 @@ var ItemsGroup = function (_React$Component7) {
       console.log(this.props);
       var _props4 = this.props,
           totalColunm = _props4.totalColunm,
-          width = _props4.width,
           items = _props4.items,
           timeSpend = _props4.timeSpend,
-          fromTime = _props4.fromTime;
+          fromTime = _props4.fromTime,
+          onClickItem = _props4.onClickItem;
 
       var timeSlots = [];
       for (var i = 0; i < totalColunm; i++) {
-        timeSlots.push(_react2.default.createElement(TimeSlot, { key: i, width: width }));
+        timeSlots.push(_react2.default.createElement(TimeSlot, { key: i }));
       }
       return _react2.default.createElement(
         'div',
-        { className: 'items-group', style: itemsGroupStyle },
+        { className: 'items-group' },
         timeSlots.map(function (_) {
           return _;
         }),
         items.map(function (item) {
-          return _react2.default.createElement(Item, { key: item.id, value: item, timeSpend: timeSpend, fromTime: fromTime });
+          return _react2.default.createElement(Item, { key: item.id, value: item, timeSpend: timeSpend, onClickItem: onClickItem, fromTime: fromTime });
         })
       );
     }
@@ -417,13 +374,7 @@ var TimeSlot = function (_React$Component8) {
   (0, _createClass3.default)(TimeSlot, [{
     key: 'render',
     value: function render() {
-      var width = this.props.width;
-
-      var style = {
-        width: width + '%',
-        height: lineHeight
-      };
-      return _react2.default.createElement('div', { className: 'time-slot', style: style });
+      return _react2.default.createElement('div', { className: 'time-slot' });
     }
   }]);
   return TimeSlot;
@@ -435,39 +386,44 @@ var TimeSlot = function (_React$Component8) {
 var Item = function (_React$Component9) {
   (0, _inherits3.default)(Item, _React$Component9);
 
-  function Item() {
+  function Item(props) {
     (0, _classCallCheck3.default)(this, Item);
-    return (0, _possibleConstructorReturn3.default)(this, (Item.__proto__ || (0, _getPrototypeOf2.default)(Item)).apply(this, arguments));
+
+    var _this11 = (0, _possibleConstructorReturn3.default)(this, (Item.__proto__ || (0, _getPrototypeOf2.default)(Item)).call(this, props));
+
+    var _this11$props = _this11.props,
+        fromTime = _this11$props.fromTime,
+        timeSpend = _this11$props.timeSpend;
+    var _this11$props$value = _this11.props.value,
+        startTime = _this11$props$value.startTime,
+        endTime = _this11$props$value.endTime;
+
+    var startTimeInMin = Math.round(startTime.unix() / 60);
+    var endTimeInMin = Math.round(endTime.unix() / 60);
+    var itemSpend = endTimeInMin - startTimeInMin;
+    var leftPosition = (startTimeInMin - fromTime) / timeSpend * 100;
+    var itemWidth = itemSpend / timeSpend * 100;
+    console.log(fromTime);
+    _this11.style = {
+      width: itemWidth + '%',
+      left: leftPosition + '%'
+    };
+    return _this11;
   }
 
   (0, _createClass3.default)(Item, [{
     key: 'render',
     value: function render() {
-      var _props5 = this.props,
-          fromTime = _props5.fromTime,
-          timeSpend = _props5.timeSpend;
+      var onClickItem = this.props.onClickItem;
       var _props$value = this.props.value,
-          title = _props$value.title,
-          startTime = _props$value.startTime,
-          endTime = _props$value.endTime;
+          id = _props$value.id,
+          title = _props$value.title;
 
-      var startTimeInMin = Math.round(startTime.unix() / 60);
-      var endTimeInMin = Math.round(endTime.unix() / 60);
-      var itemSpend = endTimeInMin - startTimeInMin;
-      var leftPosition = (startTimeInMin - fromTime) / timeSpend * 100;
-      var itemWidth = itemSpend / timeSpend * 100;
-      console.log(fromTime);
-      var style = {
-        width: itemWidth + '%',
-        position: 'absolute',
-        left: leftPosition + '%',
-        display: 'inline-block',
-        overflow: 'hidden',
-        height: lineHeight - 7
-      };
       return _react2.default.createElement(
         'div',
-        { className: 'timeline-item', style: style },
+        { className: 'timeline-item', onClick: function onClick() {
+            return onClickItem(id);
+          }, style: this.style },
         title
       );
     }
@@ -482,16 +438,15 @@ TimeLine.propTypes = {
   title: _react2.default.PropTypes.string,
   fromTime: _react2.default.PropTypes.object.isRequired, // Moment Object
   toTime: _react2.default.PropTypes.object.isRequired, // Moment Object
-  displayFrom: _react2.default.PropTypes.object, // Moment Object
-  blockWidth: _react2.default.PropTypes.number, // in Minutes
+  displayFrom: _react2.default.PropTypes.object, // Moment Object Todo: https://stackoverflow.com/questions/635706/how-to-scroll-to-an-element-inside-a-div
   timeStep: _react2.default.PropTypes.number, // in Minutes
   groups: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object),
   items: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object),
-  timeColFormat: _react2.default.PropTypes.string
+  timeColFormat: _react2.default.PropTypes.string,
+  onClickItem: _react2.default.PropTypes.func
 };
 
 TimeLine.defaultProps = {
-  blockWidth: 70,
   timeColFormat: 'HH:mm'
 };
 
