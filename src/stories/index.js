@@ -9,10 +9,12 @@ storiesOf('TimeLine', module)
     const groups = [
       { id: 1, title: 'Group 1' },
       { id: 2, title: 'Group 2' },
+      { id: 3, title: 'Past group' },
     ];
     const items = [
       { id: 1, groupId: 1, title: 'I belong to Group 1', startTime: moment(), endTime: moment().add(2, 'h') },
       { id: 2, groupId: 2, title: 'And I belong to Group 2', startTime: moment().add(-10, 'm'), endTime: moment().add(20, 'm') },
+      { id: 3, groupId: 3, title: 'Im from the past, and bring bug for you', startTime: moment().add(-36, 'h'), endTime: moment().add(-30, 'h') },
     ];
     const props = {
       title: 'React Team Timeline Calendar',

@@ -134,13 +134,13 @@ class Timer extends React.Component {
   }
   render() {
     const { leftPosition } = this.state;
-    let width = 1;
+    let display = 'block';
     if (leftPosition > 1 || leftPosition < 0) {
       // clearInterval(this.ticker);
-      width = 0;
+      display = 'none';
     }
     const timerStyle = {
-      width,
+      display,
       left: `${leftPosition * 100}%`,
     };
     return (

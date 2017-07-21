@@ -267,13 +267,13 @@ var Timer = function (_React$Component5) {
     value: function render() {
       var leftPosition = this.state.leftPosition;
 
-      var width = 1;
+      var display = 'block';
       if (leftPosition > 1 || leftPosition < 0) {
         // clearInterval(this.ticker);
-        width = 0;
+        display = 'none';
       }
       var timerStyle = {
-        width: width,
+        display: display,
         left: leftPosition * 100 + '%'
       };
       return _react2.default.createElement('div', { className: 'ticker', style: timerStyle });
