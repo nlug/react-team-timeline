@@ -2,6 +2,7 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 import moment from 'moment';
 import TimeLine from '../index';
+import '../style.css';
 
 storiesOf('TimeLine', module)
   .add('default view', () => {
