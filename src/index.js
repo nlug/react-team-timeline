@@ -4,7 +4,7 @@ import './style.css';
 
 class TimeLine extends React.Component {
   render() {
-    const { title, groups, items, fromTime, toTime, displayFrom, timeStep, blockWidth, timeColFormat, onClickItem } = this.props;
+    const { title, groups, items, fromTime, toTime, displayFrom, timeStep, timeColFormat, onClickItem } = this.props;
     const itemFiltered = items
       .filter(item => item.endTime > fromTime && item.startTime < toTime)
       .map(item => {
@@ -25,7 +25,6 @@ class TimeLine extends React.Component {
       toTime,
       displayFrom,
       timeStep,
-      blockWidth,
       timeColFormat,
       onClickItem,
     };
@@ -55,50 +54,45 @@ class SideBar extends React.Component {
   }
 }
 
-const scrollableStyle = {
-  position: 'relative',
-};
 class TimelineContent extends React.Component {
   constructor(props) {
     super(props);
-    const { timeStep, onClickItem } = props;
-    const fromTime = Math.round(props.fromTime.unix() / 60);
-    const toTime = Math.round(props.toTime.unix() / 60);
+  }
+  render() {
+    const { groups, items, title, timeColFormat, timeStep, onClickItem } = this.props;
+    const fromTime = Math.round(this.props.fromTime.unix() / 60);
+    const toTime = Math.round(this.props.toTime.unix() / 60);
     const timeSpend = toTime - fromTime;
     const totalColunm = Math.round(timeSpend / timeStep);
-
+  
     // Create col title
-    this.columns = [moment(new Date(fromTime * 60 * 1000))];
+    const columns = [moment(new Date(fromTime * 60 * 1000))];
     for (let i = 1; i < totalColunm; i++) {
-      const nextSlot = moment(this.columns[i - 1]).add(timeStep, 'm');
-      this.columns.push(nextSlot);
+      const nextSlot = moment(columns[i - 1]).add(timeStep, 'm');
+      columns.push(nextSlot);
     }
-
-    this.state = {
+  
+    const childProps = {
       fromTime,
       toTime,
       timeSpend,
       totalColunm,
       timeStep,
-      width: (1 / totalColunm) * 100,
       onClickItem,
     };
-  }
-  render() {
-    const { groups, items, title, timeColFormat } = this.props;
     return (
       <div className="timeline-content">
         <Header title={title} />
         <div className="timeline-window">
-          <div className="scrollable" style={scrollableStyle}>
+          <div className="scrollable">
             <div className="coltitle-wrapper">
               {
-                this.columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} format={timeColFormat} />)
+                columns.map((aCol, idx) => <ColTitle key={idx} time={aCol} format={timeColFormat} />)
               }
             </div>
-            <Timer fromTime={this.props.fromTime} timeSpend={this.state.timeSpend} />
+            <Timer fromTime={this.props.fromTime} timeSpend={timeSpend} />
             {
-              groups.map(aGroup => <ItemsGroup key={aGroup.id} items={items.filter(item => item.groupId === aGroup.id)} {...this.state} />)
+              groups.map(aGroup => <ItemsGroup key={aGroup.id} items={items.filter(item => item.groupId === aGroup.id)} {...childProps} />)
             }
           </div>
         </div>
@@ -125,17 +119,14 @@ class Header extends React.Component {
 class Timer extends React.Component {
   constructor(props) {
     super(props);
-    this.timeSpend = props.timeSpend * 60 * 1000;
-    this.fromTime = props.fromTime.valueOf(); // In mili seconds
-    const now = moment().valueOf();
     this.state = {
-      leftPosition: (now - this.fromTime) / this.timeSpend,
+      leftPosition: 0,
     };
   }
   componentDidMount() {
     this.ticker = setInterval(() => {
       this.setState({
-        leftPosition: (moment().valueOf() - this.fromTime) / this.timeSpend,
+        leftPosition: (moment().valueOf() - this.props.fromTime.valueOf()) / (this.props.timeSpend * 60 * 1000),
       });
     }, 1000);
   }
@@ -145,8 +136,8 @@ class Timer extends React.Component {
   render() {
     const { leftPosition } = this.state;
     let width = 1;
-    if (leftPosition > 1) {
-      clearInterval(this.ticker);
+    if (leftPosition > 1 || leftPosition < 0) {
+      // clearInterval(this.ticker);
       width = 0;
     }
     const timerStyle = {
@@ -200,22 +191,19 @@ class TimeSlot extends React.Component {
 class Item extends React.Component {
   constructor(props) {
     super(props);
-    const { fromTime, timeSpend } = this.props;
-    const { startTime, endTime } = this.props.value;
+  }
+  render() {
+    const { onClickItem, fromTime, timeSpend } = this.props;
+    const { id, title, startTime, endTime } = this.props.value;
     const startTimeInMin = Math.round(startTime.unix() / 60);
     const endTimeInMin = Math.round(endTime.unix() / 60);
     const itemSpend = endTimeInMin - startTimeInMin;
     const leftPosition = ((startTimeInMin - fromTime) / timeSpend) * 100;
     const itemWidth = (itemSpend / timeSpend) * 100;
-    console.log(fromTime);
     this.style = {
       width: `${itemWidth}%`,
       left: `${leftPosition}%`,
     };
-  }
-  render() {
-    const { onClickItem } = this.props;
-    const { id, title } = this.props.value;
     return (
       <div className="timeline-item" onClick={() => onClickItem(id)} style={this.style}>
         {title}

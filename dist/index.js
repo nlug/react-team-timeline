@@ -59,7 +59,6 @@ var TimeLine = function (_React$Component) {
           toTime = _props.toTime,
           displayFrom = _props.displayFrom,
           timeStep = _props.timeStep,
-          blockWidth = _props.blockWidth,
           timeColFormat = _props.timeColFormat,
           onClickItem = _props.onClickItem;
 
@@ -83,7 +82,6 @@ var TimeLine = function (_React$Component) {
         toTime: toTime,
         displayFrom: displayFrom,
         timeStep: timeStep,
-        blockWidth: blockWidth,
         timeColFormat: timeColFormat,
         onClickItem: onClickItem
       };
@@ -141,56 +139,45 @@ var SideBar = function (_React$Component2) {
   return SideBar;
 }(_react2.default.Component);
 
-var scrollableStyle = {
-  position: 'relative'
-};
-
 var TimelineContent = function (_React$Component3) {
   (0, _inherits3.default)(TimelineContent, _React$Component3);
 
   function TimelineContent(props) {
     (0, _classCallCheck3.default)(this, TimelineContent);
-
-    var _this3 = (0, _possibleConstructorReturn3.default)(this, (TimelineContent.__proto__ || (0, _getPrototypeOf2.default)(TimelineContent)).call(this, props));
-
-    var timeStep = props.timeStep,
-        onClickItem = props.onClickItem;
-
-    var fromTime = Math.round(props.fromTime.unix() / 60);
-    var toTime = Math.round(props.toTime.unix() / 60);
-    var timeSpend = toTime - fromTime;
-    var totalColunm = Math.round(timeSpend / timeStep);
-
-    // Create col title
-    _this3.columns = [(0, _moment2.default)(new Date(fromTime * 60 * 1000))];
-    for (var i = 1; i < totalColunm; i++) {
-      var nextSlot = (0, _moment2.default)(_this3.columns[i - 1]).add(timeStep, 'm');
-      _this3.columns.push(nextSlot);
-    }
-
-    _this3.state = {
-      fromTime: fromTime,
-      toTime: toTime,
-      timeSpend: timeSpend,
-      totalColunm: totalColunm,
-      timeStep: timeStep,
-      width: 1 / totalColunm * 100,
-      onClickItem: onClickItem
-    };
-    return _this3;
+    return (0, _possibleConstructorReturn3.default)(this, (TimelineContent.__proto__ || (0, _getPrototypeOf2.default)(TimelineContent)).call(this, props));
   }
 
   (0, _createClass3.default)(TimelineContent, [{
     key: 'render',
     value: function render() {
-      var _this4 = this;
-
       var _props2 = this.props,
           groups = _props2.groups,
           items = _props2.items,
           title = _props2.title,
-          timeColFormat = _props2.timeColFormat;
+          timeColFormat = _props2.timeColFormat,
+          timeStep = _props2.timeStep,
+          onClickItem = _props2.onClickItem;
 
+      var fromTime = Math.round(this.props.fromTime.unix() / 60);
+      var toTime = Math.round(this.props.toTime.unix() / 60);
+      var timeSpend = toTime - fromTime;
+      var totalColunm = Math.round(timeSpend / timeStep);
+
+      // Create col title
+      var columns = [(0, _moment2.default)(new Date(fromTime * 60 * 1000))];
+      for (var i = 1; i < totalColunm; i++) {
+        var nextSlot = (0, _moment2.default)(columns[i - 1]).add(timeStep, 'm');
+        columns.push(nextSlot);
+      }
+
+      var childProps = {
+        fromTime: fromTime,
+        toTime: toTime,
+        timeSpend: timeSpend,
+        totalColunm: totalColunm,
+        timeStep: timeStep,
+        onClickItem: onClickItem
+      };
       return _react2.default.createElement(
         'div',
         { className: 'timeline-content' },
@@ -200,19 +187,19 @@ var TimelineContent = function (_React$Component3) {
           { className: 'timeline-window' },
           _react2.default.createElement(
             'div',
-            { className: 'scrollable', style: scrollableStyle },
+            { className: 'scrollable' },
             _react2.default.createElement(
               'div',
               { className: 'coltitle-wrapper' },
-              this.columns.map(function (aCol, idx) {
+              columns.map(function (aCol, idx) {
                 return _react2.default.createElement(ColTitle, { key: idx, time: aCol, format: timeColFormat });
               })
             ),
-            _react2.default.createElement(Timer, { fromTime: this.props.fromTime, timeSpend: this.state.timeSpend }),
+            _react2.default.createElement(Timer, { fromTime: this.props.fromTime, timeSpend: timeSpend }),
             groups.map(function (aGroup) {
               return _react2.default.createElement(ItemsGroup, (0, _extends3.default)({ key: aGroup.id, items: items.filter(function (item) {
                   return item.groupId === aGroup.id;
-                }) }, _this4.state));
+                }) }, childProps));
             })
           )
         )
@@ -253,25 +240,22 @@ var Timer = function (_React$Component5) {
   function Timer(props) {
     (0, _classCallCheck3.default)(this, Timer);
 
-    var _this6 = (0, _possibleConstructorReturn3.default)(this, (Timer.__proto__ || (0, _getPrototypeOf2.default)(Timer)).call(this, props));
+    var _this5 = (0, _possibleConstructorReturn3.default)(this, (Timer.__proto__ || (0, _getPrototypeOf2.default)(Timer)).call(this, props));
 
-    _this6.timeSpend = props.timeSpend * 60 * 1000;
-    _this6.fromTime = props.fromTime.valueOf(); // In mili seconds
-    var now = (0, _moment2.default)().valueOf();
-    _this6.state = {
-      leftPosition: (now - _this6.fromTime) / _this6.timeSpend
+    _this5.state = {
+      leftPosition: 0
     };
-    return _this6;
+    return _this5;
   }
 
   (0, _createClass3.default)(Timer, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this7 = this;
+      var _this6 = this;
 
       this.ticker = setInterval(function () {
-        _this7.setState({
-          leftPosition: ((0, _moment2.default)().valueOf() - _this7.fromTime) / _this7.timeSpend
+        _this6.setState({
+          leftPosition: ((0, _moment2.default)().valueOf() - _this6.props.fromTime.valueOf()) / (_this6.props.timeSpend * 60 * 1000)
         });
       }, 1000);
     }
@@ -286,8 +270,8 @@ var Timer = function (_React$Component5) {
       var leftPosition = this.state.leftPosition;
 
       var width = 1;
-      if (leftPosition > 1) {
-        clearInterval(this.ticker);
+      if (leftPosition > 1 || leftPosition < 0) {
+        // clearInterval(this.ticker);
         width = 0;
       }
       var timerStyle = {
@@ -388,37 +372,31 @@ var Item = function (_React$Component9) {
 
   function Item(props) {
     (0, _classCallCheck3.default)(this, Item);
-
-    var _this11 = (0, _possibleConstructorReturn3.default)(this, (Item.__proto__ || (0, _getPrototypeOf2.default)(Item)).call(this, props));
-
-    var _this11$props = _this11.props,
-        fromTime = _this11$props.fromTime,
-        timeSpend = _this11$props.timeSpend;
-    var _this11$props$value = _this11.props.value,
-        startTime = _this11$props$value.startTime,
-        endTime = _this11$props$value.endTime;
-
-    var startTimeInMin = Math.round(startTime.unix() / 60);
-    var endTimeInMin = Math.round(endTime.unix() / 60);
-    var itemSpend = endTimeInMin - startTimeInMin;
-    var leftPosition = (startTimeInMin - fromTime) / timeSpend * 100;
-    var itemWidth = itemSpend / timeSpend * 100;
-    console.log(fromTime);
-    _this11.style = {
-      width: itemWidth + '%',
-      left: leftPosition + '%'
-    };
-    return _this11;
+    return (0, _possibleConstructorReturn3.default)(this, (Item.__proto__ || (0, _getPrototypeOf2.default)(Item)).call(this, props));
   }
 
   (0, _createClass3.default)(Item, [{
     key: 'render',
     value: function render() {
-      var onClickItem = this.props.onClickItem;
+      var _props5 = this.props,
+          onClickItem = _props5.onClickItem,
+          fromTime = _props5.fromTime,
+          timeSpend = _props5.timeSpend;
       var _props$value = this.props.value,
           id = _props$value.id,
-          title = _props$value.title;
+          title = _props$value.title,
+          startTime = _props$value.startTime,
+          endTime = _props$value.endTime;
 
+      var startTimeInMin = Math.round(startTime.unix() / 60);
+      var endTimeInMin = Math.round(endTime.unix() / 60);
+      var itemSpend = endTimeInMin - startTimeInMin;
+      var leftPosition = (startTimeInMin - fromTime) / timeSpend * 100;
+      var itemWidth = itemSpend / timeSpend * 100;
+      this.style = {
+        width: itemWidth + '%',
+        left: leftPosition + '%'
+      };
       return _react2.default.createElement(
         'div',
         { className: 'timeline-item', onClick: function onClick() {

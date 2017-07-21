@@ -32,6 +32,10 @@
   overflow-x: auto;
   overflow-y: hidden;
 }
+.scrollable {
+  display: inline-block;
+  position: relative;
+}
 .coltitle-wrapper {
   display: inline-flex;
   height: 30px; /* Time title height */
